@@ -194,4 +194,9 @@ class PiperPipelineStageInitTest extends BasePiperTest {
             'pipelineStashFilesBeforeBuild'
         ))
     }
+
+    @Test
+    void testInitStashConfig() {
+        jsr.step.piperPipelineStageInit(script: nullScript, initCloudSdkStashSettings: true, buildTool: 'maven')
+    }
 }

@@ -81,6 +81,7 @@ void call(Map parameters = [:]) {
     }
 
     def stageName = StageNameProvider.instance.getStageName(script, parameters, this)
+    println("Thats the stageName: ${stageName}")
 
     piperStageWrapper (script: script, stageName: stageName, stashContent: [], ordinal: 1, telemetryDisabled: true) {
         def scmInfo = checkout scm
