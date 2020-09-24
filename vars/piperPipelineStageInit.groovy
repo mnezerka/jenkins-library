@@ -85,7 +85,7 @@ void call(Map parameters = [:]) {
 
     def stageName = StageNameProvider.instance.getStageName(script, parameters, this)
     println("Thats the stageName: ${stageName}")
-
+/*
     if (Boolean.valueOf(env.ON_K8S) && parameters.containerMapResource && parameters.initCloudSdk) {
         scmInfo = checkout scm
 
@@ -95,13 +95,13 @@ void call(Map parameters = [:]) {
         stash allowEmpty: true, excludes: '', includes: '**', useDefaultExcludes: false, name: 'INIT'
         script.commonPipelineEnvironment.configuration.stageStashes = [ (stageName): [ unstash : ["INIT"]]]
     }
-
+*/
     piperStageWrapper (script: script, stageName: stageName, stashContent: [], ordinal: 1, telemetryDisabled: true) {
-        if (!parameters.initCloudSdk) {
+  //      if (!parameters.initCloudSdk) {
             scmInfo = checkout scm
 
             setupCommonPipelineEnvironment script: script, customDefaults: parameters.customDefaults
-        }
+    //    }
 
         Map config = ConfigurationHelper.newInstance(this)
             .loadStepDefaults()
