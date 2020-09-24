@@ -35,7 +35,7 @@ import static com.sap.piper.Prerequisites.checkScript
      * In addition, if the execution happens on K8S the step artifactPrepareVersion is **not** executed inside a docker container, but on the node instead.
      * This requires a maven executable to be available.
      */
-    'initCloudSdk',
+    'initCloudSdkStashSettings',
     /**
      * Defines the library resource containing the legacy configuration mapping.
      */
@@ -77,7 +77,7 @@ void call(Map parameters = [:]) {
 
     def script = checkScript(this, parameters) ?: this
     def utils = parameters.juStabUtils ?: new Utils()
-    def scmInfo
+
 
     if (parameters.useTechnicalStageNames) {
         StageNameProvider.instance.useTechnicalStageNames = true
@@ -85,23 +85,11 @@ void call(Map parameters = [:]) {
 
     def stageName = StageNameProvider.instance.getStageName(script, parameters, this)
     println("Thats the stageName: ${stageName}")
-/*
-    if (Boolean.valueOf(env.ON_K8S) && parameters.containerMapResource && parameters.initCloudSdk) {
-        scmInfo = checkout scm
+
+    piperStageWrapper (script: script, stageName: stageName, stashContent: [], ordinal: 1, telemetryDisabled: true) {
+        def scmInfo = checkout scm
 
         setupCommonPipelineEnvironment script: script, customDefaults: parameters.customDefaults
-        ContainerMap.instance.initFromResource(script, parameters.containerMapResource, script.commonPipelineEnvironment.buildTool)
-
-        stash allowEmpty: true, excludes: '', includes: '**', useDefaultExcludes: false, name: 'INIT'
-        script.commonPipelineEnvironment.configuration.stageStashes = [ (stageName): [ unstash : ["INIT"]]]
-    }
-*/
-    piperStageWrapper (script: script, stageName: stageName, stashContent: [], ordinal: 1, telemetryDisabled: true) {
-  //      if (!parameters.initCloudSdk) {
-            scmInfo = checkout scm
-
-            setupCommonPipelineEnvironment script: script, customDefaults: parameters.customDefaults
-    //    }
 
         Map config = ConfigurationHelper.newInstance(this)
             .loadStepDefaults()
@@ -122,7 +110,7 @@ void call(Map parameters = [:]) {
         String buildTool = checkBuildTool(script, config)
 
         //perform stashing based on library resource piper-stash-settings.yml if not configured otherwise or Cloud SDK Pipeline is initialized
-        if (config.initCloudSdk) {
+        if (config.initCloudSdkStashSettings) {
             switch (buildTool) {
                 case 'maven':
                     initStashConfiguration(script, "com.sap.piper/pipeline/cloudSdkJavaStashSettings.yml", config.verbose?: false)
@@ -166,7 +154,6 @@ void call(Map parameters = [:]) {
                 echo "[${STEP_NAME}] GitHub labels could not be retrieved from Pull Request, please make sure that credentials are maintained on multi-branch job."
             }
 
-
             setPullRequestStageStepActivation(script, config, prActions)
         }
 
@@ -178,20 +165,15 @@ void call(Map parameters = [:]) {
             if (parameters.script.commonPipelineEnvironment.configuration.runStep?.get('Init')?.slackSendNotification) {
                 slackSendNotification script: script, message: "STARTED: Job <${env.BUILD_URL}|${URLDecoder.decode(env.JOB_NAME, java.nio.charset.StandardCharsets.UTF_8.name())} ${env.BUILD_DISPLAY_NAME}>", color: 'WARNING'
             }
-            //if (config.inferBuildTool && env.ON_K8S) {
-              //  String artifactPrepareVersionMavenDockerImage = script.commonPipelineEnvironment.configuration?.steps?.artifactPrepareVersion?.dockerImage?:""
-                //artifactPrepareVersion script: script, buildTool: buildTool, maven: [dockerImage: artifactPrepareVersionMavenDockerImage]
-            //} else
-
             if (config.inferBuildTool && env.ON_K8S) {
+                artifactPrepareVersion script: script, buildTool: buildTool, dockerImage: ""
+            } else if (config.inferBuildTool ) {
                 artifactPrepareVersion script: script, buildTool: buildTool
             } else {
                 artifactSetVersion script: script
             }
 
         }
-
-
         pipelineStashFilesBeforeBuild script: script
     }
 }
