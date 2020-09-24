@@ -14,8 +14,6 @@ stepMetadata:
 containerMaps:
   init:
     - artifactPrepareVersion
-    - mavenExecute
-    - executeNpm
   build:
     - mavenBuild
     - mtaBuild
