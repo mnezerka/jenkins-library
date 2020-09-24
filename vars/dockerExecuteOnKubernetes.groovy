@@ -273,7 +273,7 @@ void executeOnPod(Map config, utils, Closure body, Script script) {
                             stash name: "workspace-${config.uniqueId}", excludes: '**/*', allowEmpty: true
                             body()
                         } finally {
-                            stashWorkspace(config, 'container', true, true)
+                            stashWorkspace(config, 'container', false, true)
                         }
                     }
                 } else {
