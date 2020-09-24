@@ -184,7 +184,7 @@ void call(Map parameters = [:]) {
                 artifactSetVersion script: script
             }
         }
-        
+
         if (Boolean.valueOf(env.ON_K8S) && config.containerMapResource) {
             ContainerMap.instance.initFromResource(script, config.containerMapResource, buildTool)
         }
