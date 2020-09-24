@@ -98,6 +98,7 @@ void call(Map parameters = [:]) {
 */
     piperStageWrapper (script: script, stageName: stageName, stashContent: [], ordinal: 1, telemetryDisabled: true) {
   //      if (!parameters.initCloudSdk) {
+        node(parameters.nodeLabel?:'master') {
             scmInfo = checkout scm
 
             setupCommonPipelineEnvironment script: script, customDefaults: parameters.customDefaults
@@ -182,7 +183,7 @@ void call(Map parameters = [:]) {
               //  String artifactPrepareVersionMavenDockerImage = script.commonPipelineEnvironment.configuration?.steps?.artifactPrepareVersion?.dockerImage?:""
                 //artifactPrepareVersion script: script, buildTool: buildTool, maven: [dockerImage: artifactPrepareVersionMavenDockerImage]
             //} else
-            node(parameters.nodeLabel?:'master') {
+
                 if (config.inferBuildTool && env.ON_K8S) {
                     artifactPrepareVersion script: script, buildTool: buildTool, containerMap: ContainerMap.instance.getMap()
                 } else {
