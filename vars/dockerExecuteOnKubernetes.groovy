@@ -350,6 +350,7 @@ private Map getSecurityContext(Map config) {
 
 private void unstashWorkspace(config, prefix) {
     //try {
+        sh "ls -l"
         echo "containerName: ${config.containerName}"
         echo "Now we will unstash: ${prefix}-${config.uniqueId}"
         unstash "${prefix}-${config.uniqueId}"
