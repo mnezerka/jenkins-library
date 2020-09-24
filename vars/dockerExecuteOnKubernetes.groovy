@@ -349,19 +349,19 @@ private Map getSecurityContext(Map config) {
 }
 
 private void unstashWorkspace(config, prefix) {
-    try {
+    //try {
         echo "Now we will unstash: ${prefix}-${config.uniqueId}"
         unstash "${prefix}-${config.uniqueId}"
         echo "invalidate stash ${prefix}-${config.uniqueId}"
         stash name: "${prefix}-${config.uniqueId}", excludes: '**/*', allowEmpty: true
-    } catch (AbortException | IOException e) {
+    /*} catch (AbortException | IOException e) {
         echo "We came into the abort exception ${e}"
         echo "${e.getMessage()}"
     } catch (Throwable e) {
         echo "We got to throwable"
         echo "Unstash workspace failed with throwable ${e.getMessage()}"
         throw e
-    }
+    }*/
 }
 
 private List getContainerList(config) {
