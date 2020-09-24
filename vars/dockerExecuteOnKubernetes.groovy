@@ -204,7 +204,7 @@ void call(Map parameters = [:], body) {
             stepParamKey1: 'scriptMissing',
             stepParam1   : parameters?.script == null
         ], config)
-
+        echo "Thats the container map: ${config.containerMap}"
         if (!config.containerMap && config.dockerImage) {
             config.containerName = 'container-exec'
             config.containerMap = [(config.get('dockerImage')): config.containerName]

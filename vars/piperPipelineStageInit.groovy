@@ -173,7 +173,7 @@ void call(Map parameters = [:]) {
         if (Boolean.valueOf(env.ON_K8S) && config.containerMapResource) {
             ContainerMap.instance.initFromResource(script, config.containerMapResource, buildTool)
         }
-        
+
         if (env.BRANCH_NAME == config.productiveBranch) {
             if (parameters.script.commonPipelineEnvironment.configuration.runStep?.get('Init')?.slackSendNotification) {
                 slackSendNotification script: script, message: "STARTED: Job <${env.BUILD_URL}|${URLDecoder.decode(env.JOB_NAME, java.nio.charset.StandardCharsets.UTF_8.name())} ${env.BUILD_DISPLAY_NAME}>", color: 'WARNING'
@@ -182,8 +182,8 @@ void call(Map parameters = [:]) {
               //  String artifactPrepareVersionMavenDockerImage = script.commonPipelineEnvironment.configuration?.steps?.artifactPrepareVersion?.dockerImage?:""
                 //artifactPrepareVersion script: script, buildTool: buildTool, maven: [dockerImage: artifactPrepareVersionMavenDockerImage]
             //} else
-            if (config.inferBuildTool) {
-                artifactPrepareVersion script: script, buildTool: buildTool
+            if (config.inferBuildTool && env.ON_K8S) {
+                artifactPrepareVersion script: script, buildTool: buildTool, containerMap: ContainerMap.instance.getMap()
             } else {
                 artifactSetVersion script: script
             }
