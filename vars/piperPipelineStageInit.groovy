@@ -170,6 +170,10 @@ void call(Map parameters = [:]) {
             setPullRequestStageStepActivation(script, config, prActions)
         }
 
+        if (Boolean.valueOf(env.ON_K8S) && config.containerMapResource) {
+            ContainerMap.instance.initFromResource(script, config.containerMapResource, buildTool)
+        }
+        
         if (env.BRANCH_NAME == config.productiveBranch) {
             if (parameters.script.commonPipelineEnvironment.configuration.runStep?.get('Init')?.slackSendNotification) {
                 slackSendNotification script: script, message: "STARTED: Job <${env.BUILD_URL}|${URLDecoder.decode(env.JOB_NAME, java.nio.charset.StandardCharsets.UTF_8.name())} ${env.BUILD_DISPLAY_NAME}>", color: 'WARNING'
@@ -185,9 +189,7 @@ void call(Map parameters = [:]) {
             }
         }
 
-        if (Boolean.valueOf(env.ON_K8S) && config.containerMapResource) {
-            ContainerMap.instance.initFromResource(script, config.containerMapResource, buildTool)
-        }
+
         pipelineStashFilesBeforeBuild script: script
     }
 }
