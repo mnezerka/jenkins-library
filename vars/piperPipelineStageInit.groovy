@@ -182,10 +182,12 @@ void call(Map parameters = [:]) {
               //  String artifactPrepareVersionMavenDockerImage = script.commonPipelineEnvironment.configuration?.steps?.artifactPrepareVersion?.dockerImage?:""
                 //artifactPrepareVersion script: script, buildTool: buildTool, maven: [dockerImage: artifactPrepareVersionMavenDockerImage]
             //} else
-            if (config.inferBuildTool && env.ON_K8S) {
-                artifactPrepareVersion script: script, buildTool: buildTool, containerMap: ContainerMap.instance.getMap()
-            } else {
-                artifactSetVersion script: script
+            node(parameters.nodeLabel?:'master') {
+                if (config.inferBuildTool && env.ON_K8S) {
+                    artifactPrepareVersion script: script, buildTool: buildTool, containerMap: ContainerMap.instance.getMap()
+                } else {
+                    artifactSetVersion script: script
+                }
             }
         }
 

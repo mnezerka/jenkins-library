@@ -350,11 +350,6 @@ private Map getSecurityContext(Map config) {
 
 private void unstashWorkspace(config, prefix) {
     //try {
-        def securityContext = getSecurityContext(config)
-        def runAsUser = securityContext?.runAsUser ?: 1000
-        def fsGroup = securityContext?.fsGroup ?: 1000
-        sh """#!${config.containerShell ?: '/bin/sh'}
-    chown -R ${runAsUser}:${fsGroup} ."""
         echo "containerName: ${config.containerName}"
         echo "Now we will unstash: ${prefix}-${config.uniqueId}"
         unstash "${prefix}-${config.uniqueId}"
